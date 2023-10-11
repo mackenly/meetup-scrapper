@@ -24,7 +24,7 @@ router.get('/api/:id/latest', async (request, env) => {
 		console.log("Fresh scrape requested")
 	} else {
 		// check if the result is already stored in KV and return it
-		const stored = await env.MEETUP_SCRAPPER_KV.get(id);
+		const stored = await env.MEETUP_SCRAPPER_KV.get(id + '-latest');
 		if (stored) {
 			console.log("Returning stored value")
 			return new Response(stored, {
@@ -45,7 +45,7 @@ router.get('/api/:id/latest', async (request, env) => {
 	}
 
 	// store the result in KV
-	await env.MEETUP_SCRAPPER_KV.put(id, JSON.stringify(result), {
+	await env.MEETUP_SCRAPPER_KV.put(id + '-latest', JSON.stringify(result), {
 		expirationTtl: 60 * 60 * 24, // 1 day
 	});
 	console.log("Stored value in KV")
