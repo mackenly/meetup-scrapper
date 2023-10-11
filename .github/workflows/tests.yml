@@ -2,8 +2,7 @@ name: Run Test
 
 on:
   push:
-    paths:
-      - 'meetup-scrapper/**'
+    branches: [ main ]
 
 jobs:
   test:
@@ -20,8 +19,6 @@ jobs:
 
     - name: Install dependencies
       run: npm ci
-      working-directory: ./meetup-scrapper
 
     - name: Run tests
       run: npm test
-      working-directory: ./meetup-scrapper
