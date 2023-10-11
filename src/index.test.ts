@@ -9,7 +9,7 @@ describe("Worker", () => {
     beforeAll(async () => {
         worker = await unstable_dev("src/index.ts", {
             experimental: { disableExperimentalWarning: false },
-            config: "wrangler.example.toml"
+            config: "wrangler-example.toml"
         });
     });
 
