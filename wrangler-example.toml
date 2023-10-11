@@ -2,6 +2,9 @@ name = "meetup-scrapper"
 main = "src/index.ts"
 compatibility_date = "2023-10-02"
 
+[placement]
+mode = "smart"
+
 [[kv_namespaces]]
 binding = "MEETUP_SCRAPPER_KV"
 id = "0000"
