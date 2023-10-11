@@ -19,15 +19,20 @@ router.get('/api/:id/latest', async (request, env) => {
 		});
 	}
 
-	// check if the result is already stored in KV and return it
-	const stored = await env.MEETUP_SCRAPPER_KV.get(id);
-	if (stored) {
-		console.log("Returning stored value")
-		return new Response(stored, {
-			headers: {
-				'content-type': 'application/json;charset=UTF-8',
-			},
-		});
+	// if ?fresh=true is passed, force a fresh scrape
+	if (request.query.fresh) {
+		console.log("Fresh scrape requested")
+	} else {
+		// check if the result is already stored in KV and return it
+		const stored = await env.MEETUP_SCRAPPER_KV.get(id);
+		if (stored) {
+			console.log("Returning stored value")
+			return new Response(stored, {
+				headers: {
+					'content-type': 'application/json;charset=UTF-8',
+				},
+			});
+		}
 	}
 
 	// get scrapper result
