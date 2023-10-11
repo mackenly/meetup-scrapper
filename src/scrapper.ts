@@ -13,79 +13,64 @@ export async function scrape(groupSlug: string) {
         console.log(`Error is: ${err}`);
         throw err;
     });
-
     const eventsPage = await htmlContent.text();
-    const hrefRegex = /<a[^>]*id="event-card-e-1"[^>]*href="([^"]*)"[^>]*>/;
-    const hrefMatch = eventsPage.match(hrefRegex);
-    var eventHref = '';
 
-    if (hrefMatch && hrefMatch[1]) {
-        console.log(`Href value is: ${hrefMatch[1]}`);
-        eventHref = hrefMatch[1];
-    } else {
-        console.log('Href value not found');
-    }
+    // Get the event href from the first event card
+    const eventHref = getTextFromHtml(eventsPage, /<a[^>]*id="event-card-e-1"[^>]*href="([^"]*)"[^>]*>/);
+    console.log(`Event href is: ${eventHref}`);
 
+    // Get the event's page
     const eventHtmlContent = await fetch(eventHref, {
         headers: {
             'content-type': 'text/html;charset=UTF-8',
         },
     });
-
     const eventPage = await eventHtmlContent.text();
-    const h1Regex = /<h1[^>]*>([^<]*)<\/h1>/;
-    const h1Match = eventPage.match(h1Regex);
-    var eventH1 = '';
 
-    if (h1Match && h1Match[1]) {
-        console.log(`H1 text is: ${h1Match[1]}`);
-        eventH1 = h1Match[1];
-    } else {
-        console.log('H1 text not found');
-    }
+    // Get the event H1
+    const eventH1 = getTextFromHtml(eventPage, /<h1[^>]*>([^<]*)<\/h1>/);
+    console.log(`Event H1 is: ${eventH1}`);
 
-    const titleRegex = /<title[^>]*>([^<]*)<\/title>/;
-    const titleMatch = eventPage.match(titleRegex);
-    var eventTitle = '', eventDate = null;
+    // Get the event title
+    let eventTitle = getTextFromHtml(eventPage, /<title[^>]*>([^<]*)<\/title>/);
+    console.log(`Event title is: ${eventTitle}`);
 
-    if (titleMatch && titleMatch[1]) {
-        eventTitle = titleMatch[1];
+    // remote " | Meetup" from title
+    eventTitle = eventTitle.replace(' | Meetup', '').trim();
 
-        // remote " | Meetup" from title
-        eventTitle = eventTitle.replace(' | Meetup', '').trim();
+    // get event date from title
+    const titleParts = eventTitle.split(',');
+    titleParts.splice(0, titleParts.length - 4);
+    eventTitle = titleParts.join(',').trim();
+    const eventDate = new Date(eventTitle).toISOString();
+    console.log(`Event date is: ${eventDate}`);
 
-        // split on comma
-        const titleParts = eventTitle.split(',');
+    // get event details/description
+    const eventDetails = getTextFromHtml(eventPage, /<div id="event-details"[^>]*>.*?<div class="break-words">([\s\S]*?)<\/div>/).replace(/<\/?[^>]+(>|$)/g, "");
+    console.log(`Event details are: ${eventDetails.substring(0, 100)}`);
 
-        // only keep the last 4 parts
-        titleParts.splice(0, titleParts.length - 4);
-
-        // join back
-        eventTitle = titleParts.join(',').trim();
-
-        // set date
-        eventDate = new Date(eventTitle).toISOString();
-    } else {
-        console.log('Title text not found');
-    }
-
-    const descriptionRegex = /<div id="event-details"[^>]*>.*?<div class="break-words">([\s\S]*?)<\/div>/;
-    const descriptionMatch = eventPage.match(descriptionRegex);
-    var eventDetails = '';
-
-    if (descriptionMatch && descriptionMatch[1]) {
-        const eventDetailsHtml = descriptionMatch[1];
-        // Remove all HTML tags to get plain text
-        const eventDetailsText = eventDetailsHtml.replace(/<\/?[^>]+(>|$)/g, "");
-        eventDetails = eventDetailsText;
-    } else {
-        console.log('Event details text not found');
-    }
-
+    // get event data
     return {
         link: eventHref || '',
         title: eventH1 || '',
         details: eventDetails || '',
         date: eventDate || '',
     };
+}
+
+/**
+ * Function that gets the text from an HTML string using a regex
+ * @param html - The HTML string of the page or element
+ * @param regex - The regex to use to get the text
+ * @returns {string} - The text found
+ */
+export function getTextFromHtml(html: string, regex: RegExp) {
+    const match = html.match(regex);
+    var text = '';
+
+    if (match && match[1]) {
+        text = match[1];
+    }
+
+    return text;
 }

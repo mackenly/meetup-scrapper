@@ -2,6 +2,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { UnstableDevWorker } from "wrangler";
 import { unstable_dev } from "wrangler";
 
+import { getTextFromHtml } from "./scrapper";
+
 describe("Worker", () => {
 
     let worker: UnstableDevWorker;
@@ -36,5 +38,17 @@ describe("Worker", () => {
         expect(responseBody).toHaveProperty("title");
         expect(responseBody).toHaveProperty("details");
         expect(responseBody).toHaveProperty("date");
+    });
+    it("should return text when given a html and a regex that matches", () => {
+        const html = "<h1>Nix Rules</h1>";
+        const regex = /<h1>([^<]*)<\/h1>/;
+        const result = getTextFromHtml(html, regex);
+        expect(result).toBe("Nix Rules");
+    });
+    it("should return empty string when given a html and a regex that doesn't match", () => {
+        const html = "<h1>Nix Rules</h1>";
+        const regex = /<h2>([^<]*)<\/h2>/;
+        const result = getTextFromHtml(html, regex);
+        expect(result).toBe("");
     });
 });
