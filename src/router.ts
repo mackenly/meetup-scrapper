@@ -57,6 +57,18 @@ router.get('/api/:id/latest', async (request, env) => {
 	});
 });
 
+router.get('/api/:id', async (request, env) => {
+	// TODO: implement
+	return new Response(JSON.stringify({
+		"error": "Not implemented.",
+	}), {
+		status: 501,
+		headers: {
+			"content-type": "application/json;charset=UTF-8",
+		},
+	});
+});
+
 // 404 for everything else
 router.all('*', () => {
 	return new Response(JSON.stringify({
