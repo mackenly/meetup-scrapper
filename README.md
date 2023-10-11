@@ -1,10 +1,24 @@
-# meetup-scrapper
+# Meetup Scrapper
 API for getting the latest meetup event for a group using only the fetch API. Currently caches requests for 24 hours via CLoudflare KV.
 
+## Setup
+- Create a KV store with Wrangler
+- Copy `wrangler-example.toml` to `wrangler.toml` and fill in the binding id for your new KV store
+- Deploy with `wrangler deploy`
 
-## Get Latest Meetup Event
-GET - /api/tridev/latest
-Example response:
+## Tests
+Tests are setup for:
+- Checking that root URL is 404
+- Checking that invalid paths are 404
+- Checking that valid paths return 200 and the correct data
+
+Tests run on push to `main` via GitHub actions or can be run locally with `vitest run`.
+
+
+## API Route
+GET - /api/{meetup group slug}/latest
+
+Example 200 response:
 ```json
 {
   "link": "https://www.meetup.com/tridev/events/294188453/",
