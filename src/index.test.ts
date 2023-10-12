@@ -30,13 +30,13 @@ describe("Worker", () => {
         expect(headers.get("content-type")).toBe("application/json;charset=UTF-8");
     });
     it("should return 200 and valid response for latest tridev event", async () => {
-        const response = await worker.fetch(`http://${worker.address}:8787/api/tridev/latest`);
+        const response = await worker.fetch(`http://${worker.address}:8787/api/tridev/latest?fresh=true`);
         expect(response.status).toBe(200);
         expect(response.headers.get("content-type")).toBe("application/json;charset=UTF-8");
         const responseBody: any = await response.json();
         expect(responseBody).toHaveProperty("link");
         expect(responseBody).toHaveProperty("title");
-        expect(responseBody).toHaveProperty("details");
+        expect(responseBody).toHaveProperty("description");
         expect(responseBody).toHaveProperty("date");
     });
     it("should return text when given a html and a regex that matches", () => {

@@ -1,9 +1,10 @@
 /**
  * Scrapper function that gets the latest event from the a Meetup group
  * @param {string} groupSlug - The Meetup group slug found in the URL
- * @returns {Promise<{link: string, title: string, details: string}>}
+ * @param {Env} env - The environment variables
+ * @returns {Promise<{link: string, title: string, description: string, date: string}>}
  */
-export async function scrape(groupSlug: string) {
+export async function scrape(groupSlug: string, env: Env) {
     console.log(`Group slug is: ${groupSlug}`);
     const htmlContent = await fetch(`https://www.meetup.com/${groupSlug}/events/?type=upcoming`, {
         headers: {
@@ -42,18 +43,20 @@ export async function scrape(groupSlug: string) {
     const titleParts = eventTitle.split(',');
     titleParts.splice(0, titleParts.length - 4);
     eventTitle = titleParts.join(',').trim();
-    const eventDate = new Date(eventTitle).toISOString();
+    // the string is in EST, so we need to add 5 hours to get UTC
+    const TIMEZONE_NAME = env.TIMEZONE_NAME || 'EST';
+    const eventDate = new Date(eventTitle + ` ${TIMEZONE_NAME}`).toISOString();
     console.log(`Event date is: ${eventDate}`);
 
     // get event details/description
-    const eventDetails = getTextFromHtml(eventPage, /<div id="event-details"[^>]*>.*?<div class="break-words">([\s\S]*?)<\/div>/).replace(/<\/?[^>]+(>|$)/g, "");
-    console.log(`Event details are: ${eventDetails.substring(0, 100)}`);
+    const eventDescription = getTextFromHtml(eventPage, /<div id="event-details"[^>]*>.*?<div class="break-words">([\s\S]*?)<\/div>/).replace(/<\/?[^>]+(>|$)/g, "");
+    console.log(`Event description is: ${eventDescription.substring(0, 100)}`);
 
     // get event data
     return {
         link: eventHref || '',
         title: eventH1 || '',
-        details: eventDetails || '',
+        description: eventDescription || '',
         date: eventDate || '',
     };
 }

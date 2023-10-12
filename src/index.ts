@@ -51,7 +51,7 @@ const router = Router()
 	// get scrapper result
 	let result;
 	try {
-		result = await scrape(id);
+		result = await scrape(id, env);
 	} catch (err) {
 		console.log(`Error is: ${err}`);
 		return new Response('Error invalid url', { status: 404 });
