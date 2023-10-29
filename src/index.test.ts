@@ -54,6 +54,13 @@ describe("Worker", () => {
         expect(responseBody).toHaveProperty("location");
         expect(responseBody).toHaveProperty("memberCount");
         expect(responseBody).toHaveProperty("groupType");
+        expect(responseBody).toHaveProperty("featuredImage");
         expect(responseBody).toHaveProperty("description");
+        expect(responseBody).toHaveProperty("otherLink");
+        expect(responseBody).toHaveProperty("twitterLink");
+        expect(responseBody).toHaveProperty("upcomingEvents");
+        expect(responseBody).toHaveProperty("pastEvent");
+        expect(responseBody).toHaveProperty("sponsors");
+        expect(responseBody).toHaveProperty("topics");
     });
 });
