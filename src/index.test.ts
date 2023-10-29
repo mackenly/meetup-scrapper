@@ -2,8 +2,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { UnstableDevWorker } from "wrangler";
 import { unstable_dev } from "wrangler";
 
-import { getTextFromHtml } from "./scrapper";
-
 describe("Worker", () => {
 
     let worker: UnstableDevWorker;
@@ -30,25 +28,39 @@ describe("Worker", () => {
         expect(headers.get("content-type")).toBe("application/json;charset=UTF-8");
     });
     it("should return 200 and valid response for latest tridev event", async () => {
-        const response = await worker.fetch(`http://${worker.address}:8787/api/tridev/latest`);
+        const response = await worker.fetch(`http://${worker.address}:8787/api/tridev/latest?fresh=true`);
         expect(response.status).toBe(200);
         expect(response.headers.get("content-type")).toBe("application/json;charset=UTF-8");
         const responseBody: any = await response.json();
-        expect(responseBody).toHaveProperty("link");
-        expect(responseBody).toHaveProperty("title");
-        expect(responseBody).toHaveProperty("details");
+        expect(responseBody).toHaveProperty("id");
+        expect(responseBody).toHaveProperty("groupSlug");
+        expect(responseBody).toHaveProperty("href");
+        expect(responseBody).toHaveProperty("groupHref");
+        expect(responseBody).toHaveProperty("name");
+        expect(responseBody).toHaveProperty("description");
         expect(responseBody).toHaveProperty("date");
+        expect(responseBody).toHaveProperty("location");
+        expect(responseBody).toHaveProperty("groupName");
+        expect(responseBody).toHaveProperty("groupType");
     });
-    it("should return text when given a html and a regex that matches", () => {
-        const html = "<h1>Nix Rules</h1>";
-        const regex = /<h1>([^<]*)<\/h1>/;
-        const result = getTextFromHtml(html, regex);
-        expect(result).toBe("Nix Rules");
-    });
-    it("should return empty string when given a html and a regex that doesn't match", () => {
-        const html = "<h1>Nix Rules</h1>";
-        const regex = /<h2>([^<]*)<\/h2>/;
-        const result = getTextFromHtml(html, regex);
-        expect(result).toBe("");
+    it("should return 200 and valid response for tridev group", async () => {
+        const response = await worker.fetch(`http://${worker.address}:8787/api/tridev?fresh=true`);
+        expect(response.status).toBe(200);
+        expect(response.headers.get("content-type")).toBe("application/json;charset=UTF-8");
+        const responseBody: any = await response.json();
+        expect(responseBody).toHaveProperty("slug");
+        expect(responseBody).toHaveProperty("href");
+        expect(responseBody).toHaveProperty("name");
+        expect(responseBody).toHaveProperty("location");
+        expect(responseBody).toHaveProperty("memberCount");
+        expect(responseBody).toHaveProperty("groupType");
+        expect(responseBody).toHaveProperty("featuredImage");
+        expect(responseBody).toHaveProperty("description");
+        expect(responseBody).toHaveProperty("otherLink");
+        expect(responseBody).toHaveProperty("twitterLink");
+        expect(responseBody).toHaveProperty("upcomingEvents");
+        expect(responseBody).toHaveProperty("pastEvent");
+        expect(responseBody).toHaveProperty("sponsors");
+        expect(responseBody).toHaveProperty("topics");
     });
 });
